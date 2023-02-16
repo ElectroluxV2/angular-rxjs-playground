@@ -1,6 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { BehaviorSubject, combineLatest, filter, ReplaySubject } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  Observable,
+  ReplaySubject,
+} from 'rxjs';
+
+const filterCombineLatest = (
+  sources: Observable<unknown>[],
+  ...withFilters: [Observable<unknown>, (value: unknown) => boolean][]
+) =>
+  combineLatest(sources.concat(withFilters.map(([source]) => source))).pipe(
+    filter((values) =>
+      values
+        .slice(sources.length)
+        .every((value, index) => withFilters[index][1](value))
+    )
+  );
 
 @Component({
   selector: 'main-component',
@@ -19,11 +37,18 @@ export class MainComponent {
   protected logs: string[] = [];
 
   public constructor() {
-    combineLatest([this.results$, this.agGridApi$])
-      .pipe(filter(([r, a]) => a !== false))
-      .subscribe(([r, a]) => {
-        this.log(`Combine latest results: ${r}, api avaliable: ${a}`);
-      });
+    // combineLatest([this.results$, this.agGridApi$])
+    //   .pipe(filter(([r, a]) => a !== false))
+    //   .subscribe(([r, a]) => {
+    //     this.log(`Combine latest results: ${r}, api avaliable: ${a}`);
+    //   });
+
+    filterCombineLatest(
+      [this.results$],
+      [this.agGridApi$, (x) => x !== false]
+    ).subscribe(([r, a]) => {
+      this.log(`Filter combine latest2 results: ${r}, api avaliable: ${a}`);
+    });
   }
 
   protected nextResults(): void {

@@ -1,13 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  filter,
-  ReplaySubject,
-  Subject,
-  withLatestFrom,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'main-component',
@@ -18,36 +11,27 @@ import {
 })
 export class MainComponent {
   private lastResults = 0;
-  protected readonly results$ = new BehaviorSubject<number>(0);
+  protected readonly results$ = new ReplaySubject<number>(1);
 
-  protected readonly agGridApi$ = new BehaviorSubject<boolean>(false);
-  private readonly usableAgGridApi$ = this.agGridApi$.pipe(
-    filter((x) => x === true)
-  );
+  private lastApi = 0;
+  protected readonly agGridApi$ = new BehaviorSubject<number | false>(false);
 
   protected logs: string[] = [];
 
   public constructor() {
-    combineLatest([
-      this.results$,
-      this.agGridApi$.pipe(filter((x) => x === true)),
-    ]).subscribe(([a, b]) => {
-      this.log(`Combine latest results: ${a}, api avaliable: ${b}`);
-    });
-
-    // this.results$
-    //   .pipe(withLatestFrom(this.usableAgGridApi$))
-    //   .subscribe(([a, b]) => {
-    //     this.log(`With latest a: ${a}, b: ${b}`);
-    //   });
+    combineLatest([this.results$, this.agGridApi$])
+      .pipe(filter(([r, a]) => a !== false))
+      .subscribe(([a, b]) => {
+        this.log(`Combine latest results: ${a}, api avaliable: ${b}`);
+      });
   }
 
   protected nextResults(): void {
     this.results$.next(++this.lastResults);
   }
 
-  protected nextApiInitial(): void {
-    this.agGridApi$.next(true);
+  protected nextApiNext(): void {
+    this.agGridApi$.next(++this.lastApi);
   }
 
   protected nextApiDestroy(): void {

@@ -1,4 +1,16 @@
 :host {
   display: grid;
-  grid-template-columns: repeat(1fr, 3);
+  grid-template-columns: repeat(3, 1fr);
+
+  section {
+    text-align: center;
+    grid-column: 1 / 4;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  ol {
+    grid-column: 1 / 4;
+    border: 1px solid black;
+  }
 }

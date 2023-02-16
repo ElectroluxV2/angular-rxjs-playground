@@ -21,8 +21,8 @@ export class MainComponent {
   public constructor() {
     combineLatest([this.results$, this.agGridApi$])
       .pipe(filter(([r, a]) => a !== false))
-      .subscribe(([a, b]) => {
-        this.log(`Combine latest results: ${a}, api avaliable: ${b}`);
+      .subscribe(([r, a]) => {
+        this.log(`Combine latest results: ${r}, api avaliable: ${a}`);
       });
   }
 

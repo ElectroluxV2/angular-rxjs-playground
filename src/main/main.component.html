@@ -1,0 +1,10 @@
+<button (click)="nextResults()">Emit results</button>
+<button (click)="nextApiInitial()">Emit API initial</button>
+<button (click)="nextApiDestroy()">Emit API destroy</button>
+
+<span>Current api: {{ agGridApi$ | async }}</span>
+<span>Current results: {{ results$ | async }}</span>
+
+<ol>
+  <li *ngFor="let log of logs">{{ log }}</li>
+</ol>
